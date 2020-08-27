@@ -11,6 +11,9 @@
     "moduleResolution": "node",
     "declaration": true
   },
+  "ts-node": {
+    "files": true
+  },
   "include": [
     "src"
   ],
