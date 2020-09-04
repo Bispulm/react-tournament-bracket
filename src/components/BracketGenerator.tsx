@@ -3,7 +3,7 @@ import { CSSProperties } from 'react';
 import * as _ from 'underscore';
 import Bracket, { BracketProps } from './Bracket';
 import winningPathLength from '../util/winningPathLength';
-import { Game } from './model';
+import { Game } from '../model';
 
 export const makeFinals = ({ games }: { games: Game[] }): Array<{ game: Game, height: number }> => {
   const gamesFeedInto = _.map(

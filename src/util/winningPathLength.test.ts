@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { loserOf, makeGame } from '../testing/games';
-import { Game } from '../components/model';
+import { Game } from '../model';
 import winningPathLength from './winningPathLength';
 
 describe('winningPathLength', () => {

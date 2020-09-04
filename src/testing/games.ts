@@ -1,4 +1,4 @@
-import { Game, SideInfo } from '../components/model';
+import { Game, SideInfo } from '../model';
 
 const winnerOf = (sourceGame?: Game): SideInfo => (
   sourceGame ?

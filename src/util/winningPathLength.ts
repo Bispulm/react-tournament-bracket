@@ -1,5 +1,5 @@
 import * as _ from 'underscore';
-import { Game } from '../components/model';
+import { Game } from '../model';
 
 export default function winningPathLength(game: Game, visited: { [ id: string ]: true } = {}): number {
   if (visited[ game.id ]) {

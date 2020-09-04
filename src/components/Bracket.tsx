@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as _ from 'underscore';
 import winningPathLength from '../util/winningPathLength';
 import BracketGame from './BracketGame';
-import { Game, Side } from './model';
+import { Game, Side } from '../model';
 
 export interface LineInfo {
   yOffset: number;

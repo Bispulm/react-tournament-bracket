@@ -30,7 +30,7 @@ export interface Game {
   name: string;
   // optional: the label for the game within the bracket, e.g. Gold Finals, Silver Semi-Finals
   bracketLabel?: string;
-  // the unix timestamp of the game-will be transformed to a human-readable time using momentjs
+  // when the game is scheduled, in milliseconds since the Unix epoch
   scheduled: number;
 
   court?: {
