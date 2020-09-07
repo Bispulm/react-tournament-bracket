@@ -1,7 +1,7 @@
 import * as  React from 'react';
 import { RectClipped } from './Clipped';
 import { Game, Side, SideInfo } from '../model';
-import * as controllable from 'react-controllables';
+import controllable from 'react-controllables';
 import * as _ from 'underscore';
 
 interface BracketGameProps {
