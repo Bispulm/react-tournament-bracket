@@ -10,7 +10,7 @@ const ROOT: any = _.findWhere(GAMES, { id: '35b0745d-ef13-4255-8c40-c9daa95e4cc4
 export default class App extends React.PureComponent {
   public state = {
     homeOnTopState: true,
-    hoveredTeamId: null
+    hoveredTeamId: null as string | null
   };
 
   public render() {
