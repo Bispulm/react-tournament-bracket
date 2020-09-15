@@ -7,7 +7,8 @@
     "dev": "vite",
     "typecheck": "tsc",
     "build": "npm run typecheck && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "smoke": "node smoke-test.js"
   },
   "dependencies": {
     "jsog": "^1.0.7",
@@ -19,6 +20,7 @@
     "@types/react": "^16.14.70",
     "@types/react-dom": "^16.9.25",
     "@types/underscore": "^1.13.0",
+    "playwright-core": "^1.64.1",
     "typescript": "^5.9.3",
     "vite": "^8.3.6"
   }

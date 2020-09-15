@@ -23,3 +23,7 @@ npm run dev
 | `npm run typecheck` | Type-check the demo along with the library source it imports |
 | `npm run build`     | Type-check, then write a production build to `dist/`         |
 | `npm run preview`   | Serve the production build locally                           |
+| `npm run smoke`     | Load the production build in Chrome and check that it works  |
+
+The smoke test drives the Chrome installed on your machine, so it needs a local copy of Chrome and a prior
+`npm run build`.
