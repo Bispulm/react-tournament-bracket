@@ -1,16 +1,19 @@
 import * as  React from 'react';
 import { RectClipped } from './Clipped';
-import { Game, Side, SideInfo } from './model';
-import * as controllable from 'react-controllables';
+import { Game, Side, SideInfo } from '../model';
 import * as _ from 'underscore';
 
-interface BracketGameProps {
+export interface BracketGameProps extends React.SVGAttributes<SVGSVGElement> {
   game: Game;
 
   homeOnTop?: boolean;
-  hoveredTeamId?: string | null;
 
-  onHoveredTeamIdChange: (id: string) => void;
+  // the highlighted team, where null means none. Leave this undefined to have the component track the mouse itself
+  hoveredTeamId?: string | null;
+  // the team to highlight initially when the component tracks the mouse itself
+  defaultHoveredTeamId?: string | null;
+  onHoveredTeamIdChange?: (id: string | null) => void;
+
   styles?: {
     backgroundColor: string;
     hoverBackgroundColor: string;
@@ -26,10 +29,45 @@ interface BracketGameProps {
   bottomText?: (game: Game) => string;
 }
 
-class BracketGame extends React.PureComponent<BracketGameProps> {
-  static defaultProps: Partial<BracketGameProps> = {
+interface SideComponentProps {
+  x: number;
+  y: number;
+  side: SideInfo;
+  onHover: (id: string | null) => void;
+  teamNameStyle: React.CSSProperties;
+  teamScoreStyle: React.CSSProperties;
+}
+
+// Lives outside BracketGame so that a row keeps its identity between renders. Declared inside render, it was a new
+// component type each time, so every hover change replaced the element under the mouse and re-fired its mouse events.
+const SideComponent = ({ x, y, side, onHover, teamNameStyle, teamScoreStyle }: SideComponentProps) => {
+  const tooltip = side.seed && side.team ? <title>{side.seed.displayName}</title> : null;
+
+  return (
+    <g onMouseEnter={() => onHover(side && side.team ? side.team.id : null)} onMouseLeave={() => onHover(null)}>
+      {/* trigger mouse events on the entire block */}
+      <rect x={x} y={y} height={22.5} width={200} fillOpacity={0}>
+        {tooltip}
+      </rect>
+
+      <RectClipped x={x} y={y} height={22.5} width={165}>
+        <text x={x + 5} y={y + 16}
+              style={{ ...teamNameStyle, fontStyle: side.seed && side.seed.sourcePool ? 'italic' : null }}>
+          {tooltip}
+          {side.team ? side.team.name : (side.seed ? side.seed.displayName : null)}
+        </text>
+      </RectClipped>
+
+      <text x={x + 185} y={y + 16} style={teamScoreStyle} textAnchor="middle">
+        {side.score ? side.score.score : null}
+      </text>
+    </g>
+  );
+};
+
+export default class BracketGame extends React.PureComponent<BracketGameProps, { hoveredTeamId: string | null }> {
+  static defaultProps = {
     homeOnTop: true,
-    hoveredTeamId: null,
 
     styles: {
       backgroundColor: '#58595e',
@@ -48,11 +86,24 @@ class BracketGame extends React.PureComponent<BracketGameProps> {
     bottomText: ({ name, bracketLabel }: Game) => _.compact([ name, bracketLabel ]).join(' - ')
   };
 
+  state = { hoveredTeamId: this.props.defaultHoveredTeamId === undefined ? null : this.props.defaultHoveredTeamId };
+
+  handleHover = (hoveredTeamId: string | null) => {
+    const { onHoveredTeamIdChange } = this.props;
+
+    this.setState({ hoveredTeamId });
+
+    if (onHoveredTeamIdChange) {
+      onHoveredTeamIdChange(hoveredTeamId);
+    }
+  };
+
   render() {
     const {
       game,
 
-      hoveredTeamId,
+      hoveredTeamId: hoveredTeamIdProp,
+      defaultHoveredTeamId,
       onHoveredTeamIdChange,
 
       styles: {
@@ -74,6 +125,8 @@ class BracketGame extends React.PureComponent<BracketGameProps> {
       ...rest
     } = this.props;
 
+    const hoveredTeamId = hoveredTeamIdProp === undefined ? this.state.hoveredTeamId : hoveredTeamIdProp;
+
     const { sides } = game;
 
 
@@ -87,38 +140,6 @@ class BracketGame extends React.PureComponent<BracketGameProps> {
           <rect x="170" y="34.5" width="30" height="22.5" style={{ fill: winningScoreBackground }} rx="3" ry="3"/>
       ) :
       null;
-
-    interface SideComponentProps {
-      x: number;
-      y: number;
-      side: SideInfo;
-      onHover: (id: string | null) => void
-    }
-
-    const SideComponent = ({ x, y, side, onHover }: SideComponentProps) => {
-      const tooltip = side.seed && side.team ? <title>{side.seed.displayName}</title> : null;
-
-      return (
-        <g onMouseEnter={() => onHover(side && side.team ? side.team.id : null)} onMouseLeave={() => onHover(null)}>
-          {/* trigger mouse events on the entire block */}
-          <rect x={x} y={y} height={22.5} width={200} fillOpacity={0}>
-            {tooltip}
-          </rect>
-
-          <RectClipped x={x} y={y} height={22.5} width={165}>
-            <text x={x + 5} y={y + 16}
-                  style={{ ...teamNameStyle, fontStyle: side.seed && side.seed.sourcePool ? 'italic' : null }}>
-              {tooltip}
-              {side.team ? side.team.name : (side.seed ? side.seed.displayName : null)}
-            </text>
-          </RectClipped>
-
-          <text x={x + 185} y={y + 16} style={teamScoreStyle} textAnchor="middle">
-            {side.score ? side.score.score : null}
-          </text>
-        </g>
-      );
-    };
 
     const topHovered = (top && top.team && top.team.id === hoveredTeamId),
       bottomHovered = (bottom && bottom.team && bottom.team.id === hoveredTeamId);
@@ -151,13 +172,15 @@ class BracketGame extends React.PureComponent<BracketGameProps> {
         {/* the players */}
         {
           top ? (
-            <SideComponent x={0} y={12} side={top} onHover={onHoveredTeamIdChange}/>
+            <SideComponent x={0} y={12} side={top} onHover={this.handleHover}
+                           teamNameStyle={teamNameStyle} teamScoreStyle={teamScoreStyle}/>
           ) : null
         }
 
         {
           bottom ? (
-            <SideComponent x={0} y={34.5} side={bottom} onHover={onHoveredTeamIdChange}/>
+            <SideComponent x={0} y={34.5} side={bottom} onHover={this.handleHover}
+                           teamNameStyle={teamNameStyle} teamScoreStyle={teamScoreStyle}/>
           ) : null
         }
 
@@ -171,5 +194,3 @@ class BracketGame extends React.PureComponent<BracketGameProps> {
     );
   }
 }
-
-export default controllable(BracketGame, [ 'hoveredTeamId' ]);

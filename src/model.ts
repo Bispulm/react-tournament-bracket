@@ -13,8 +13,9 @@ export interface SideInfo {
   seed?: {
     displayName: string;
     rank: number;
-    sourceGame: Game;
-    sourcePool: object;
+    // the game this side comes from, if it isn't seeded directly into the game
+    sourceGame?: Game | null;
+    sourcePool?: object | null;
   };
 
   team?: {
@@ -29,7 +30,7 @@ export interface Game {
   name: string;
   // optional: the label for the game within the bracket, e.g. Gold Finals, Silver Semi-Finals
   bracketLabel?: string;
-  // the unix timestamp of the game-will be transformed to a human-readable time using momentjs
+  // when the game is scheduled, in milliseconds since the Unix epoch
   scheduled: number;
 
   court?: {
