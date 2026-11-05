@@ -13,8 +13,9 @@ export interface SideInfo {
   seed?: {
     displayName: string;
     rank: number;
-    sourceGame: Game;
-    sourcePool: object;
+    // the game this side comes from, if it isn't seeded directly into the game
+    sourceGame?: Game | null;
+    sourcePool?: object | null;
   };
 
   team?: {

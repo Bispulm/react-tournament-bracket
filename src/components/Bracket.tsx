@@ -46,7 +46,7 @@ const toBracketGames = ({ GameComponent, game, x, y, gameDimensions, roundSepara
     _.chain(game.sides)
       .map((sideInfo, side: Side) => ({ ...sideInfo, side }))
       // filter to the teams that come from winning other games
-      .filter(({ seed }) => seed && seed.sourceGame !== null && seed.rank === 1)
+      .filter(({ seed }) => seed && seed.sourceGame && seed.rank === 1)
       .map(
         ({ seed: { sourceGame }, side }) => {
           // we put visitor teams on the bottom
