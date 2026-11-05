@@ -43,16 +43,17 @@
     "react": "*"
   },
   "devDependencies": {
-    "@types/mocha": "^5.2.0",
-    "@types/moment": "^2.13.0",
-    "@types/react": "^16.3.13",
-    "@types/rimraf": "^2.0.2",
-    "@types/underscore": "^1.8.8",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.19.2",
+    "@types/react": "^16.14.70",
+    "@types/react-test-renderer": "^16.9.13",
+    "@types/underscore": "^1.13.0",
     "@types/uuid": "^3.4.3",
-    "mocha": "^5.1.1",
-    "react": "^16.3.2",
+    "mocha": "^12.0.3",
+    "react": "^16.14.0",
+    "react-test-renderer": "^16.14.0",
     "rimraf": "^2.6.2",
-    "ts-node": "^6.0.2",
-    "typescript": "^2.8.3"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }
