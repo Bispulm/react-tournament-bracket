@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as React from 'react';
 import { create } from 'react-test-renderer';
 import Bracket from './Bracket';
-import { Game } from './model';
+import { Game } from '../model';
 import { makeGame } from '../testing/games';
 
 const renderedGames = (game: Game) => {

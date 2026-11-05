@@ -4,7 +4,7 @@ import { create, ReactTestRenderer } from 'react-test-renderer';
 import Bracket from './Bracket';
 import BracketGenerator, { makeFinals } from './BracketGenerator';
 import { loserOf, makeGame } from '../testing/games';
-import { Game } from './model';
+import { Game } from '../model';
 
 const summarize = (games: Game[]) => makeFinals({ games }).map(({ game, height }) => [ game.id, height ]);
 
