@@ -10,7 +10,7 @@ interface BracketGameProps {
   homeOnTop?: boolean;
   hoveredTeamId?: string | null;
 
-  onHoveredTeamIdChange: (id: string) => void;
+  onHoveredTeamIdChange: (id: string | null) => void;
   styles?: {
     backgroundColor: string;
     hoverBackgroundColor: string;
@@ -25,6 +25,42 @@ interface BracketGameProps {
   topText?: (game: Game) => string;
   bottomText?: (game: Game) => string;
 }
+
+interface SideComponentProps {
+  x: number;
+  y: number;
+  side: SideInfo;
+  onHover: (id: string | null) => void;
+  teamNameStyle: React.CSSProperties;
+  teamScoreStyle: React.CSSProperties;
+}
+
+// Lives outside BracketGame so that a row keeps its identity between renders. Declared inside render, it was a new
+// component type each time, so every hover change replaced the element under the mouse and re-fired its mouse events.
+const SideComponent = ({ x, y, side, onHover, teamNameStyle, teamScoreStyle }: SideComponentProps) => {
+  const tooltip = side.seed && side.team ? <title>{side.seed.displayName}</title> : null;
+
+  return (
+    <g onMouseEnter={() => onHover(side && side.team ? side.team.id : null)} onMouseLeave={() => onHover(null)}>
+      {/* trigger mouse events on the entire block */}
+      <rect x={x} y={y} height={22.5} width={200} fillOpacity={0}>
+        {tooltip}
+      </rect>
+
+      <RectClipped x={x} y={y} height={22.5} width={165}>
+        <text x={x + 5} y={y + 16}
+              style={{ ...teamNameStyle, fontStyle: side.seed && side.seed.sourcePool ? 'italic' : null }}>
+          {tooltip}
+          {side.team ? side.team.name : (side.seed ? side.seed.displayName : null)}
+        </text>
+      </RectClipped>
+
+      <text x={x + 185} y={y + 16} style={teamScoreStyle} textAnchor="middle">
+        {side.score ? side.score.score : null}
+      </text>
+    </g>
+  );
+};
 
 class BracketGame extends React.PureComponent<BracketGameProps> {
   static defaultProps: Partial<BracketGameProps> = {
@@ -88,38 +124,6 @@ class BracketGame extends React.PureComponent<BracketGameProps> {
       ) :
       null;
 
-    interface SideComponentProps {
-      x: number;
-      y: number;
-      side: SideInfo;
-      onHover: (id: string | null) => void
-    }
-
-    const SideComponent = ({ x, y, side, onHover }: SideComponentProps) => {
-      const tooltip = side.seed && side.team ? <title>{side.seed.displayName}</title> : null;
-
-      return (
-        <g onMouseEnter={() => onHover(side && side.team ? side.team.id : null)} onMouseLeave={() => onHover(null)}>
-          {/* trigger mouse events on the entire block */}
-          <rect x={x} y={y} height={22.5} width={200} fillOpacity={0}>
-            {tooltip}
-          </rect>
-
-          <RectClipped x={x} y={y} height={22.5} width={165}>
-            <text x={x + 5} y={y + 16}
-                  style={{ ...teamNameStyle, fontStyle: side.seed && side.seed.sourcePool ? 'italic' : null }}>
-              {tooltip}
-              {side.team ? side.team.name : (side.seed ? side.seed.displayName : null)}
-            </text>
-          </RectClipped>
-
-          <text x={x + 185} y={y + 16} style={teamScoreStyle} textAnchor="middle">
-            {side.score ? side.score.score : null}
-          </text>
-        </g>
-      );
-    };
-
     const topHovered = (top && top.team && top.team.id === hoveredTeamId),
       bottomHovered = (bottom && bottom.team && bottom.team.id === hoveredTeamId);
 
@@ -151,13 +155,15 @@ class BracketGame extends React.PureComponent<BracketGameProps> {
         {/* the players */}
         {
           top ? (
-            <SideComponent x={0} y={12} side={top} onHover={onHoveredTeamIdChange}/>
+            <SideComponent x={0} y={12} side={top} onHover={onHoveredTeamIdChange}
+                           teamNameStyle={teamNameStyle} teamScoreStyle={teamScoreStyle}/>
           ) : null
         }
 
         {
           bottom ? (
-            <SideComponent x={0} y={34.5} side={bottom} onHover={onHoveredTeamIdChange}/>
+            <SideComponent x={0} y={34.5} side={bottom} onHover={onHoveredTeamIdChange}
+                           teamNameStyle={teamNameStyle} teamScoreStyle={teamScoreStyle}/>
           ) : null
         }
 
