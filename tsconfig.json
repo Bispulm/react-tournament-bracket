@@ -9,11 +9,7 @@
     "noImplicitAny": true,
     "outDir": "lib",
     "moduleResolution": "node",
-    "esModuleInterop": true,
     "declaration": true
-  },
-  "ts-node": {
-    "files": true
   },
   "include": [
     "src"

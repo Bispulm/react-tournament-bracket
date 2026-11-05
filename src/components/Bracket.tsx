@@ -17,7 +17,7 @@ export interface GameComponentProps {
   homeOnTop: boolean;
 }
 
-export type GameComponent = React.ComponentType<GameComponentProps>;
+export type GameComponent = React.ComponentType<GameComponentProps> | typeof BracketGame;
 
 interface BracketGamesFunctionProps {
   game: Game;

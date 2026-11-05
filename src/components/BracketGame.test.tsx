@@ -52,4 +52,73 @@ describe('BracketGame', () => {
 
     assert.deepEqual(fills, [ '#58595e', '#222' ]);
   });
+
+  describe('hover state', () => {
+    const rows = (tree: ReactTestRenderer) => tree.root.findAll(({ type, props }) => type === 'g' && !!props.onMouseEnter);
+    const litRows = (tree: ReactTestRenderer) => (
+      tree.root.findAll(({ type, props }) => type === 'rect' && props.height === '22.5' && !!props.fill)
+        .map(({ props: { fill } }) => fill === '#222')
+    );
+
+    it('tracks the hovered team itself when hoveredTeamId is not passed', () => {
+      const tree = create(<BracketGame game={game}/>);
+      assert.deepEqual(litRows(tree), [ false, false ]);
+
+      rows(tree)[ 1 ].props.onMouseEnter();
+      assert.deepEqual(litRows(tree), [ false, true ]);
+
+      rows(tree)[ 1 ].props.onMouseLeave();
+      assert.deepEqual(litRows(tree), [ false, false ]);
+    });
+
+    it('still reports changes when it tracks the hovered team itself', () => {
+      const changes: Array<string | null> = [];
+      const tree = create(<BracketGame game={game} onHoveredTeamIdChange={(id: string | null) => changes.push(id)}/>);
+
+      rows(tree)[ 0 ].props.onMouseEnter();
+
+      assert.deepEqual(changes, [ 'home-team' ]);
+      assert.deepEqual(litRows(tree), [ true, false ]);
+    });
+
+    it('lets a passed hoveredTeamId win over the mouse', () => {
+      const tree = create(<BracketGame game={game} hoveredTeamId="visitor-team"/>);
+
+      rows(tree)[ 0 ].props.onMouseEnter();
+
+      assert.deepEqual(litRows(tree), [ false, true ]);
+    });
+
+    it('treats a passed null as no hovered team, not as uncontrolled', () => {
+      const tree = create(<BracketGame game={game} hoveredTeamId={null}/>);
+
+      rows(tree)[ 0 ].props.onMouseEnter();
+
+      assert.deepEqual(litRows(tree), [ false, false ]);
+    });
+
+    it('starts from defaultHoveredTeamId and can then change', () => {
+      const tree = create(<BracketGame game={game} defaultHoveredTeamId="home-team"/>);
+      assert.deepEqual(litRows(tree), [ true, false ]);
+
+      rows(tree)[ 1 ].props.onMouseEnter();
+      assert.deepEqual(litRows(tree), [ false, true ]);
+    });
+
+    it('does not forward its own props to the svg element', () => {
+      const { props } = create(<BracketGame game={game} defaultHoveredTeamId="home-team"/>).root.findByType('svg');
+
+      assert.deepEqual(
+        [ 'defaultHoveredTeamId', 'hoveredTeamId', 'onHoveredTeamIdChange', 'game' ].filter(name => name in props),
+        []
+      );
+    });
+
+    it('forwards other props to the svg element', () => {
+      const onClick = (): void => undefined;
+      const { props } = create(<BracketGame game={game} x={10} y={20} onClick={onClick}/>).root.findByType('svg');
+
+      assert.deepEqual([ props.x, props.y, props.onClick ], [ 10, 20, onClick ]);
+    });
+  });
 });
