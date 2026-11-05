@@ -56,23 +56,25 @@ export interface BracketGeneratorProps extends Omit<BracketProps, 'game'> {
   style?: CSSProperties;
 }
 
+interface BracketGeneratorState {
+  // the games that finals was last derived from
+  games: Game[] | null;
+  finals: Array<{ game: Game; height: number; }>;
+}
+
 /**
  * Displays the brackets for some set of games sorted by bracket height
  */
-export default class BracketGenerator extends React.Component<BracketGeneratorProps, { finals: Array<{ game: Game; height: number; }> }> {
+export default class BracketGenerator extends React.Component<BracketGeneratorProps, BracketGeneratorState> {
   static defaultProps = {
     titleComponent: BracketTitle
   };
 
-  state = {
-    finals: makeFinals({ games: this.props.games })
-  };
-
-  componentWillReceiveProps({ games }: BracketGeneratorProps) {
-    if (games !== this.props.games) {
-      this.setState({ finals: makeFinals({ games }) });
-    }
+  static getDerivedStateFromProps({ games }: BracketGeneratorProps, state: BracketGeneratorState) {
+    return games === state.games ? null : { games, finals: makeFinals({ games }) };
   }
+
+  state: BracketGeneratorState = { games: null, finals: [] };
 
   render() {
     const { games, titleComponent: TitleComponent, style, ...rest } = this.props;
