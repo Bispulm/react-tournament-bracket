@@ -5,26 +5,16 @@ import Bracket, { BracketProps } from './Bracket';
 import winningPathLength from '../util/winningPathLength';
 import { Game } from './model';
 
-const makeFinals = ({ games }: { games: Game[] }): Array<{ game: Game, height: number }> => {
-  const isInGroup = (() => {
-    const gameIdHash: { [ id: string ]: true } =
-      _.reduce(games, ({ id }: Game, memo) => ({ ...memo, [ id ]: true }), {});
-
-    return (id: string) => (gameIdHash[ id ] === true);
-  })();
-
+export const makeFinals = ({ games }: { games: Game[] }): Array<{ game: Game, height: number }> => {
   const gamesFeedInto = _.map(
     games,
     game => ({
       ...game,
       feedsInto: _.filter(
         games,
-        ({ id, sides }) => (
-          isInGroup(id) &&
-          _.any(
-            sides,
-            ({ seed }) => seed && seed.sourceGame && seed.rank === 1 && seed.sourceGame.id === game.id
-          )
+        ({ sides }) => _.any(
+          sides,
+          ({ seed }) => seed && seed.sourceGame && seed.rank === 1 && seed.sourceGame.id === game.id
         )
       )
     })
